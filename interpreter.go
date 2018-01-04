@@ -29,7 +29,7 @@ func giveOutput(code string) string {
 	var result rune
 
 	//looping through the code and modifying cellStrip accordingly
-	for index, ch := range code {
+	for _, ch := range code {
 		switch string(ch) {
 		case "+":
 			cellStrip[position]++
