@@ -7,6 +7,7 @@ import (
 )
 
 var words = [8]string{">", "<", "+", "-", ".", ",", "[", "]"}
+var cellStrip = make([]rune, 30000)
 
 //eliminate characters not supported to get a single line string of instructions
 func minimiseCode(code string) string {
@@ -21,26 +22,26 @@ func minimiseCode(code string) string {
 	return minimised
 }
 
-//Return the result of the program
-func giveOutput(code string) string {
+//Change the value of cellString according to instruction
+func giveOutput(code string) {
 
-	var cellStrip = make([]rune, len(code))
-	position := 0
-	var result rune
+	position := 0 //holds position of the current cell
+	pointer := 0  //points to the code character being executed
 
 	//looping through the code and modifying cellStrip accordingly
-	for _, ch := range code {
+	for ; pointer < len(code); pointer++ {
+		ch := code[pointer]
 		switch string(ch) {
 		case "+":
 			cellStrip[position]++
 		case "-":
-			cellStrip[position]++
+			cellStrip[position]--
 		case ">":
 			position++
 		case "<":
 			position--
 		case ".":
-			result += cellStrip[position]
+			fmt.Printf("%s", string(cellStrip[position]))
 		case ",":
 			reader := bufio.NewReader(os.Stdin)
 			input, _, err := reader.ReadRune()
@@ -48,31 +49,46 @@ func giveOutput(code string) string {
 				fmt.Fprintf(os.Stderr, "%v", err)
 			}
 			cellStrip[position] = input
+		case "[":
+			if cellStrip[position] == 0 {
+				for string(code[pointer]) != "]" {
+					pointer++
+				}
+				continue
+			} else {
+				continue
+			}
+		case "]":
+			if cellStrip[position] == 0 {
+				continue
+			} else {
+				for string(code[pointer]) != "[" {
+					pointer--
+				}
+			}
 
 		}
+
 	}
-	return code
 }
 
 func main() {
 	var code string
 	var minimised string
-	var output string
-
-	//Print welcome message
-	fmt.Println("An interpreter for the language Brainfuck \nVersion 1.0")
-	fmt.Print(">>>")
 
 	//Input buffer
 	input := bufio.NewScanner(os.Stdin)
+
+	//Print welcome message
+	fmt.Println("An interpreter for the language Brainfuck \nVersion 1.0")
+
+	fmt.Print("$$$ ")
 
 	//Take the code input until user enters the word 'end'
 	for input.Scan() && input.Text() != "end" {
 		code += input.Text()
 	}
-
 	minimised = minimiseCode(code)
-	output = giveOutput(minimised)
-	fmt.Println(output)
+	giveOutput(minimised)
 
 }
