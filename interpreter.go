@@ -24,10 +24,31 @@ func minimiseCode(code string) string {
 //Return the result of the program
 func giveOutput(code string) string {
 
-	for _, ch := range code {
+	var cellStrip = make([]rune, len(code))
+	position := 0
+	var result rune
+
+	//looping through the code and modifying cellStrip accordingly
+	for index, ch := range code {
 		switch string(ch) {
 		case "+":
-			fmt.Println(ch)
+			cellStrip[position]++
+		case "-":
+			cellStrip[position]++
+		case ">":
+			position++
+		case "<":
+			position--
+		case ".":
+			result += cellStrip[position]
+		case ",":
+			reader := bufio.NewReader(os.Stdin)
+			input, _, err := reader.ReadRune()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v", err)
+			}
+			cellStrip[position] = input
+
 		}
 	}
 	return code
